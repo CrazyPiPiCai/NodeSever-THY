@@ -1,31 +1,35 @@
 ﻿// JavaScript source code
-'use strict';
+"use strict";
 
-const ADODB = require('node-adodb');
-const connection = ADODB.open('Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\testForDB\\TestDB2.accdb;Persist Security Info=False;');
+var mysql = require("mysql");
+
+var pool = mysql.createPool({
+    connectionLimit: 5,
+    host: 'localhost',
+    user: 'root',
+    password: 'fy121212', 
+    database: 'test_db'
+});
 
 var DB = {
-    'start': function () {
-        return connection
-            .query(`SELECT * FROM App_start`)
-            .then(data => {
-                return JSON.stringify(data, null, 2)
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    },
-    'App': function (sheet_name) {
-        return connection
-            .query(`SELECT * FROM ${sheet_name}`)
-            .then(data => {
-                return JSON.stringify(data, null, 2)
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    },
-}
+  'start': function(req,res) {
+    pool.getConnection(function(err, con) {
+        if (err) throw err;
+        con.query("SELECT * FROM tb_emp1", function(err, result) {
+            return res.jsonp(result);
+        });
+        con.release();
+      });
+  },
+  'App': function(req,res,sheet_name) {
+    pool.getConnection(function(err, con) {
+        if (err) throw err;
+        con.query(`SELECT * FROM ${sheet_name}`, function(err, result) {
+            return res.jsonp(result);
+        });
+        con.release();
+      });
+  }
+};
 
 exports = module.exports = DB;
-
