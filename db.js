@@ -8,14 +8,14 @@ var pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'fy121212', 
-    database: 'test_db'
+    database: 'app_thy'
 });
 
 var DB = {
   'start': function(req,res) {
     pool.getConnection(function(err, con) {
         if (err) throw err;
-        con.query("SELECT * FROM tb_emp1", function(err, result) {
+        con.query("SELECT * FROM start", function(err, result) {
             return res.jsonp(result);
         });
         con.release();
